@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>HireSmart AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-slate-50">
+
+<div id="root"></div>
+
+<script type="text/javascript">
+
+function App() {
+  return React.createElement(
+    "div",
+    { className: "p-10 text-center" },
+    React.createElement("h1", { className: "text-3xl font-bold text-blue-600" }, "HireSmart AI"),
+    React.createElement("p", null, "AI Hiring Assistant is working ✅"),
+    React.createElement("button", {
+      className: "mt-4 bg-blue-600 text-white px-6 py-2 rounded",
+      onClick: () => alert("AI Analysis coming soon")
+    }, "Analyze Candidate")
+  );
+}
+
+ReactDOM.render(
+  React.createElement(App),
+  document.getElementById("root")
+);
+
+</script>
+
+</body>
+</html>
