@@ -1,19 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>HireSmart AI</title>
-
+  <title>Hiring Manager AI Agent</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-
-  <!-- PDF reader library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-
 </head>
 
-<body class="bg-slate-100">
+<body class="bg-gray-100">
 
 <div id="root"></div>
 
@@ -23,178 +17,83 @@ const { useState } = React;
 
 function App() {
 
-  const [resumeText, setResumeText] = useState("");
-  const [jobDescription, setJobDescription] = useState("");
+  const [resume, setResume] = useState("");
+  const [jd, setJd] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Extract text from PDF
-  const extractPDFText = async (file) => {
+  const analyze = async () => {
 
-    const reader = new FileReader();
-
-    reader.onload = async function() {
-
-      const typedarray = new Uint8Array(reader.result);
-
-      const pdf = await pdfjsLib.getDocument(typedarray).promise;
-
-      let text = "";
-
-      for (let i = 1; i <= pdf.numPages; i++) {
-
-        const page = await pdf.getPage(i);
-
-        const content = await page.getTextContent();
-
-        const strings = content.items.map(item => item.str);
-
-        text += strings.join(" ") + "\n";
-
-      }
-
-      setResumeText(text);
-
-      alert("Resume loaded successfully");
-
-    };
-
-    reader.readAsArrayBuffer(file);
-
-  };
-
-
-  const handleFileUpload = (event) => {
-
-    const file = event.target.files[0];
-
-    if (file) {
-
-      extractPDFText(file);
-
-    }
-
-  };
-
-
-  const analyzeCandidate = async () => {
-
-    if (!resumeText || !jobDescription) {
-
-      alert("Please upload resume and enter job description");
-
+    if (!resume || !jd) {
+      alert("Please enter both Resume and Job Description");
       return;
-
     }
 
     setLoading(true);
-
-    setResult("Analyzing...");
+    setResult("Analyzing candidate...");
 
     try {
 
-      const response = await fetch("https://agentic-aii.onrender.com/evaluate", {
-
+      const response = await fetch("PASTE_YOUR_NGROK_URL_HERE/evaluate", {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json"
         },
-
         body: JSON.stringify({
-          resume: resumeText,
-          job_description: jobDescription
+          resume: resume,
+          job_description: jd
         })
-
       });
 
       const data = await response.json();
-
       setResult(data.evaluation);
 
-    }
-    catch(error) {
-
-      setResult("Error connecting to backend");
-
+    } catch (error) {
+      console.error(error);
+      setResult("Error connecting to backend.");
     }
 
     setLoading(false);
-
   };
 
-
   return (
+    React.createElement("div", { className: "max-w-4xl mx-auto mt-10 bg-white p-6 rounded shadow" },
 
-    React.createElement(
-      "div",
-      { className: "min-h-screen p-8" },
+      React.createElement("h1", { className: "text-3xl font-bold mb-6 text-blue-600" },
+        "Hiring Manager AI Agent 🚀"
+      ),
 
-      React.createElement(
-        "div",
-        { className: "max-w-4xl mx-auto bg-white p-6 rounded-xl shadow" },
+      React.createElement("textarea", {
+        placeholder: "Paste Resume here...",
+        rows: 6,
+        className: "w-full border p-3 mb-4 rounded",
+        onChange: (e) => setResume(e.target.value)
+      }),
 
-        React.createElement(
-          "h1",
-          { className: "text-3xl font-bold text-blue-600 mb-4" },
-          "HireSmart AI - Hiring Assistant"
-        ),
+      React.createElement("textarea", {
+        placeholder: "Paste Job Description here...",
+        rows: 6,
+        className: "w-full border p-3 mb-4 rounded",
+        onChange: (e) => setJd(e.target.value)
+      }),
 
-        // Resume Upload
-        React.createElement("input", {
-          type: "file",
-          accept: ".pdf",
-          onChange: handleFileUpload,
-          className: "mb-4"
-        }),
+      React.createElement("button", {
+        onClick: analyze,
+        className: "bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700"
+      }, loading ? "Analyzing..." : "Analyze Candidate"),
 
-        // OR paste resume text
-        React.createElement("textarea", {
-          placeholder: "OR paste resume text here...",
-          className: "w-full border p-3 rounded mb-4",
-          rows: 5,
-          onChange: (e) => setResumeText(e.target.value)
-        }),
-
-        // Job description
-        React.createElement("textarea", {
-          placeholder: "Paste Job Description here...",
-          className: "w-full border p-3 rounded mb-4",
-          rows: 5,
-          onChange: (e) => setJobDescription(e.target.value)
-        }),
-
-        React.createElement(
-          "button",
-          {
-            className: "bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700",
-            onClick: analyzeCandidate
-          },
-          loading ? "Analyzing..." : "Analyze Candidate"
-        ),
-
-        React.createElement(
-          "div",
-          { className: "mt-6 p-4 bg-gray-100 rounded min-h-[120px]" },
-
-          React.createElement("pre", null, result || "Result will appear here...")
-
-        )
-
+      React.createElement("div", {
+        className: "mt-6 p-4 bg-gray-100 rounded min-h-[150px] whitespace-pre-wrap"
+      },
+        result || "Result will appear here..."
       )
-
     )
-
   );
-
 }
 
 ReactDOM.render(
-
   React.createElement(App),
-
   document.getElementById("root")
-
 );
 
 </script>
